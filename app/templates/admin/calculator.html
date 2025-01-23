@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div id="app">
+    <router-view></router-view>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/utils/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/router.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/CalculatorView.js') }}"></script>
+<script>
+const app = Vue.createApp({});
+app.use(router);
+app.mount('#app');
+</script>
+{% endblock %} 

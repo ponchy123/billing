@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="app">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <span class="navbar-brand">运费计算系统</span>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.products') }}">产品管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin.users') }}">用户管理</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.postal_zones') }}">邮编区域</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">退出</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <user-list></user-list>
+    </div>
+</div>
+
+{% raw %}
+<script>
+    const { createApp, ref, onMounted } = Vue
+    
+    const UserList = {
+        template: `
+            <div class="container mt-4">
+                <h2>用户管理</h2>
+                <div class="mb-3">
+                    <button class="btn btn-primary" @click="createUser">新增用户</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="user in users" :key="user.id">
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role ? user.role.name : '无' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-2" @click="editUser(user)">编辑</button>
+                                <button class="btn btn-sm btn-danger" @click="deleteUser(user)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `,
+        setup() {
+            const users = ref([])
+
+            const fetchUsers = async () => {
+                try {
+                    const response = await fetch('/api/users')
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`)
+                    }
+                    const data = await response.json()
+                    console.log('Users:', data)
+                    users.value = data
+                } catch (error) {
+                    console.error('获取用户列表失败:', error)
+                }
+            }
+
+            const createUser = () => {
+                // TODO: 实现新增用户功能
+            }
+
+            const editUser = (user) => {
+                // TODO: 实现编辑用户功能
+            }
+
+            const deleteUser = async (user) => {
+                if (confirm('确定要删除这个用户吗？')) {
+                    try {
+                        const response = await fetch(`/api/users/${user.id}`, {
+                            method: 'DELETE'
+                        })
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`)
+                        }
+                        await fetchUsers()
+                    } catch (error) {
+                        console.error('删除用户失败:', error)
+                    }
+                }
+            }
+
+            onMounted(() => {
+                console.log('UserList mounted')
+                fetchUsers()
+            })
+
+            return {
+                users,
+                createUser,
+                editUser,
+                deleteUser
+            }
+        }
+    }
+
+    const app = createApp({
+        components: {
+            'user-list': UserList
+        }
+    })
+
+    app.mount('#app')
+</script>
+{% endraw %}
+{% endblock %} 

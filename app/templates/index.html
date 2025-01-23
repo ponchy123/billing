@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运费计算系统</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- 自定义样式 -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
+  <style>
+    /* 对话框样式 */
+    .modal-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+    }
+    
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+    
+    .modal-dialog {
+      position: relative;
+      z-index: 1060;
+      margin: 0;
+      pointer-events: auto;
+    }
+    
+    .modal-content {
+      background-color: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem;
+    }
+    
+    .modal-body {
+      padding: 1rem;
+    }
+    
+    .modal-footer {
+      border-top: 1px solid #dee2e6;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- 核心依赖 -->
+  <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/vue-router@4.2.4/dist/vue-router.global.js"></script>
+  <script src="https://unpkg.com/mitt@3.0.1/dist/mitt.umd.js"></script>
+  <script src="https://unpkg.com/axios@1.4.0/dist/axios.min.js"></script>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- 工具函数 -->
+  <script src="{{ url_for('static', filename='js/utils/index.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/utils/format.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/utils/cache.js') }}"></script>
+  
+  <!-- API 请求 -->
+  <script src="{{ url_for('static', filename='js/api/request.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/api/index.js') }}"></script>
+
+  <!-- 公共组件 -->
+  <script src="{{ url_for('static', filename='js/components/common/LoadingSpinner.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/components/common/ConfirmDialog.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/components/common/ErrorHandler.js') }}"></script>
+
+  <!-- 初始化 -->
+  <script>
+    // 创建事件总线
+    window.emitter = mitt()
+
+    // 创建认证状态
+    const authState = Vue.reactive({
+      token: localStorage.getItem('token'),
+      user: null,
+      isAuthenticated: false
+    })
+
+    // 创建全局 store
+    window.stores = {
+      auth: {
+        state: authState,
+        getters: {
+          currentUser: () => authState.user,
+          userToken: () => authState.token
+        },
+        actions: {
+          async login(credentials) {
+            try {
+              const response = await window.api.auth.login(credentials)
+              const { token, user } = response
+              authState.token = token
+              authState.user = user
+              authState.isAuthenticated = true
+              localStorage.setItem('token', token)
+              return response
+            } catch (error) {
+              console.error('Login failed:', error)
+              throw error
+            }
+          },
+          async logout() {
+            try {
+              await window.api.auth.logout()
+            } catch (error) {
+              console.error('Logout failed:', error)
+            } finally {
+              authState.token = null
+              authState.user = null
+              authState.isAuthenticated = false
+              localStorage.removeItem('token')
+            }
+          },
+          async fetchCurrentUser() {
+            try {
+              const response = await window.api.auth.getCurrentUser()
+              authState.user = response
+              authState.isAuthenticated = true
+              return response
+            } catch (error) {
+              console.error('Failed to fetch user:', error)
+              this.logout()
+              throw error
+            }
+          },
+          initializeAuth() {
+            const token = localStorage.getItem('token')
+            if (token) {
+              authState.token = token
+              authState.isAuthenticated = true
+              this.fetchCurrentUser()
+            }
+          }
+        }
+      }
+    }
+
+    // 导出认证 store
+    window.useAuthStore = () => window.stores.auth
+  </script>
+
+  <!-- 视图组件 -->
+  <script src="{{ url_for('static', filename='js/views/auth/LoginView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/DashboardView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/UsersView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/UserEdit.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/ProductList.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/ProductAdd.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/ProductEdit.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/PostalZonesView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/FuelRatesView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/admin/CalculatorView.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views/error/403.js') }}"></script>
+
+  <!-- 布局组件 -->
+  <script src="{{ url_for('static', filename='js/layouts/AdminLayout.js') }}"></script>
+
+  <!-- 路由 -->
+  <script src="{{ url_for('static', filename='js/router/guards.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/router.js') }}"></script>
+
+  <!-- 主应用 -->
+  <script src="{{ url_for('static', filename='js/App.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}客户中心 - 运费计算系统{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>客户中心</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">个人信息</h3>
+            </div>
+            <div class="panel-body">
+                <p>管理您的个人信息和密码。</p>
+                <a href="{{ url_for('customer.profile') }}" class="btn btn-primary">查看详情</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">费用计算</h3>
+            </div>
+            <div class="panel-body">
+                <p>计算运输费用。</p>
+                <a href="{{ url_for('customer.calculate') }}" class="btn btn-info">开始计算</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">计算记录</h3>
+            </div>
+            <div class="panel-body">
+                <p>查看历史计算记录。</p>
+                <a href="{{ url_for('customer.calculations') }}" class="btn btn-success">查看记录</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

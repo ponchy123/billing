@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="app">
+  <router-view></router-view>
+</div>
+
+{% raw %}
+<script src="/static/js/views/admin/ProductList.js"></script>
+<script src="/static/js/views/admin/ProductEdit.js"></script>
+<script src="/static/js/views/admin/ProductAdd.js"></script>
+<script src="/static/js/router.js"></script>
+
+<script>
+const app = Vue.createApp({});
+app.use(window.router);
+app.mount('#app');
+</script>
+{% endraw %}
+{% endblock %}

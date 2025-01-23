@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="login-app">
+  <login-view></login-view>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 等待 DOM 加载完成后初始化登录页面
+window.addEventListener('DOMContentLoaded', () => {
+  // 检查认证状态
+  if (window.authStore && window.authStore.state.isAuthenticated) {
+    window.location.href = '/admin'
+  }
+
+  // 创建全局 Vue 应用
+  window.loginApp = Vue.createApp({
+    components: {
+      'login-view': window.LoginView
+    }
+  })
+  
+  // 挂载应用
+  window.loginApp.mount('#login-app')
+})
+</script>
+{% endblock %} 

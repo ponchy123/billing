@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="registerApp">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">注册</h4>
+                    </div>
+                    <div class="card-body">
+                        <form @submit.prevent="register">
+                            <input type="hidden" name="csrf_token" :value="csrf_token">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="username" 
+                                       v-model="form.username" required
+                                       :class="{ 'is-invalid': errors.username }"
+                                       @blur="checkUsername">
+                                <div v-if="errors.username" class="invalid-feedback">
+                                    {{ errors.username[0] }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">邮箱</label>
+                                <input type="email" class="form-control" id="email" 
+                                       v-model="form.email" required
+                                       :class="{ 'is-invalid': errors.email }"
+                                       @blur="checkEmail">
+                                <div v-if="errors.email" class="invalid-feedback">
+                                    {{ errors.email[0] }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">密码</label>
+                                <input type="password" class="form-control" id="password" 
+                                       v-model="form.password" required
+                                       :class="{ 'is-invalid': errors.password }">
+                                <div v-if="errors.password" class="invalid-feedback">
+                                    {{ errors.password[0] }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">确认密码</label>
+                                <input type="password" class="form-control" id="password2" 
+                                       v-model="form.password2" required
+                                       :class="{ 'is-invalid': errors.password2 }">
+                                <div v-if="errors.password2" class="invalid-feedback">
+                                    {{ errors.password2[0] }}
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" :disabled="loading">
+                                    {{ loading ? '注册中...' : '注册' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <div class="small">
+                            已有账号？<a href="{{ url_for('auth.login') }}">立即登录</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const { createApp, ref } = Vue;
+
+createApp({
+    setup() {
+        const form = ref({
+            username: '',
+            email: '',
+            password: '',
+            password2: ''
+        });
+        const errors = ref({});
+        const loading = ref(false);
+        const csrf_token = "{{ csrf_token() }}";
+
+        const checkUsername = async () => {
+            if (!form.value.username) return;
+            
+            try {
+                const response = await fetch(`{{ url_for('auth.check_username') }}?username=${form.value.username}`);
+                const data = await response.json();
+                if (!data.available) {
+                    errors.value.username = ['该用户名已被使用'];
+                } else {
+                    delete errors.value.username;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        const checkEmail = async () => {
+            if (!form.value.email) return;
+            
+            try {
+                const response = await fetch(`{{ url_for('auth.check_email') }}?email=${form.value.email}`);
+                const data = await response.json();
+                if (!data.available) {
+                    errors.value.email = ['该邮箱已被注册'];
+                } else {
+                    delete errors.value.email;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        const register = async () => {
+            loading.value = true;
+            errors.value = {};
+
+            try {
+                const response = await fetch("{{ url_for('auth.register') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf_token
+                    },
+                    body: JSON.stringify(form.value)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = "{{ url_for('auth.login') }}";
+                } else {
+                    errors.value = data.errors || {};
+                    if (data.message) {
+                        showNotification(data.message, 'danger');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('注册失败，请稍后重试', 'danger');
+            } finally {
+                loading.value = false;
+            }
+        };
+
+        return {
+            form,
+            errors,
+            loading,
+            csrf_token,
+            checkUsername,
+            checkEmail,
+            register
+        };
+    }
+}).mount('#registerApp');
+</script>
+{% endblock %} 

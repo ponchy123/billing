@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}请求详情{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-header">请求详情</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ request.title }}</h5>
+                    <div class="mb-3">
+                        <span class="text-muted">客户：</span>{{ request.user.username }}
+                        <span class="text-muted ml-3">状态：</span>
+                        {% if request.status == 'pending' %}
+                        <span class="badge bg-warning">待处理</span>
+                        {% elif request.status == 'processing' %}
+                        <span class="badge bg-info">处理中</span>
+                        {% elif request.status == 'completed' %}
+                        <span class="badge bg-success">已完成</span>
+                        {% else %}
+                        <span class="badge bg-secondary">已关闭</span>
+                        {% endif %}
+                        <span class="text-muted ml-3">创建时间：</span>{{ moment(request.created_at).format('YYYY-MM-DD HH:mm:ss') }}
+                        <span class="text-muted ml-3">更新时间：</span>{{ moment(request.updated_at).format('YYYY-MM-DD HH:mm:ss') }}
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            {{ request.content }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>回复记录</h5>
+                        {% if request.replies %}
+                        {% for reply in request.replies %}
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ reply.user.username }}</strong>
+                                        <small class="text-muted ml-2">{{ moment(reply.created_at).format('YYYY-MM-DD HH:mm:ss') }}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    {{ reply.content }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-muted">暂无回复</p>
+                        {% endif %}
+                    </div>
+
+                    {% if request.status != 'closed' %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">添加回复</h5>
+                            <form method="post" action="{{ url_for('.reply_request', id=request.id) }}">
+                                {{ form.hidden_tag() }}
+                                <div class="mb-3">
+                                    {{ form.content.label(class="form-label") }}
+                                    {{ form.content(class="form-control") }}
+                                </div>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{{ url_for('.requests') }}" class="btn btn-secondary">返回列表</a>
+                        {% if request.status == 'pending' %}
+                        <a href="{{ url_for('.process_request', id=request.id) }}" class="btn btn-info">开始处理</a>
+                        {% elif request.status == 'processing' %}
+                        <a href="{{ url_for('.complete_request', id=request.id) }}" class="btn btn-success">标记完成</a>
+                        {% endif %}
+                        {% if request.status != 'closed' %}
+                        <a href="{{ url_for('.close_request', id=request.id) }}" class="btn btn-secondary">关闭请求</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
