@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}批量计算 - 运费计算系统{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="page-header">
+        <h1>批量计算</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">上传Excel文件</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {{ form.hidden_tag() if form }}
+                        <div class="mb-3">
+                            <label for="file" class="form-label">选择Excel文件</label>
+                            <input type="file" class="form-control" id="file" name="file" 
+                                   accept=".xlsx,.xls" required>
+                            <div class="form-text">
+                                请上传包含以下列的Excel文件：长度、宽度、高度、重量、起始邮编、收件邮编、订单日期
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="product_id" class="form-label">选择产品</label>
+                            <select class="form-select" id="product_id" name="product_id" required>
+                                <option value="">请选择产品</option>
+                                {% if products %}
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">开始计算</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if results %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">计算结果</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>长度</th>
+                                    <th>宽度</th>
+                                    <th>高度</th>
+                                    <th>重量</th>
+                                    <th>起始邮编</th>
+                                    <th>收件邮编</th>
+                                    <th>分区</th>
+                                    <th>基本费用</th>
+                                    <th>附加费用</th>
+                                    <th>燃油费</th>
+                                    <th>总费用</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ result.length }}</td>
+                                    <td>{{ result.width }}</td>
+                                    <td>{{ result.height }}</td>
+                                    <td>{{ result.weight }}</td>
+                                    <td>{{ result.start_postcode }}</td>
+                                    <td>{{ result.receiver_postcode }}</td>
+                                    <td>{{ result.zone }}</td>
+                                    <td>{{ result.base_fee }}</td>
+                                    <td>{{ result.total_surcharge }}</td>
+                                    <td>{{ result.fuel_fee }}</td>
+                                    <td>{{ result.total_fee }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-success">
+                            <i class="bi bi-download"></i> 导出结果
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

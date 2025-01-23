@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="app"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- 核心库 -->
+<script>
+console.log('开始加载 Vue 相关库...');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+<script>
+console.log('Vue 对象:', Vue);
+console.log('Vue.version:', Vue.version);
+window.Vue = Vue;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue-router@4.2.4/dist/vue-router.global.js"></script>
+<script>
+console.log('VueRouter 对象:', VueRouter);
+console.log('VueRouter.version:', VueRouter.version);
+window.VueRouter = VueRouter;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 工具函数 -->
+<script src="{{ url_for('static', filename='js/utils/format.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils/index.js') }}"></script>
+
+<!-- API 配置 -->
+<script src="{{ url_for('static', filename='js/api/request.js') }}"></script>
+<script src="{{ url_for('static', filename='js/api/index.js') }}"></script>
+
+<!-- 公共组件 -->
+<script src="{{ url_for('static', filename='js/components/common/ErrorHandler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/common/LoadingSpinner.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/common/ConfirmDialog.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/common/FileUpload.js') }}"></script>
+
+<!-- 布局组件 -->
+<script src="{{ url_for('static', filename='js/views/admin/AdminLayout.js') }}"></script>
+
+<!-- 视图组件 -->
+<script src="{{ url_for('static', filename='js/views/auth/LoginView.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/DashboardView.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/UsersView.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/ProductList.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/ProductEdit.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/PostalZonesView.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/CalculatorView.js') }}"></script>
+<script src="{{ url_for('static', filename='js/views/admin/FuelRatesView.js') }}"></script>
+
+<!-- 错误页面 -->
+<script src="{{ url_for('static', filename='js/views/error/NotFoundView.js') }}"></script>
+
+<!-- 路由 -->
+<script src="{{ url_for('static', filename='js/router/index.js') }}"></script>
+
+<!-- App -->
+<script src="{{ url_for('static', filename='js/App.js') }}"></script>
+
+<!-- 主入口 -->
+<script>
+console.log('主入口文件加载前检查:', {
+    Vue: Vue && Vue.version,
+    VueRouter: VueRouter && VueRouter.version
+});
+</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+console.log('主入口文件加载完成');
+console.log('App 实例:', window.app);
+</script>
+{% endblock %} 

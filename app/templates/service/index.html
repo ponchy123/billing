@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}客服中心{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-header">客服中心</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">客户请求</h5>
+                    <p class="card-text">处理客户提交的请求和问题</p>
+                    <a href="{{ url_for('.requests') }}" class="btn btn-primary">查看请求</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">费用计算</h5>
+                    <p class="card-text">计算运输费用</p>
+                    <a href="{{ url_for('.calculate') }}" class="btn btn-primary">开始计算</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">计算记录</h5>
+                    <p class="card-text">查看历史计算记录</p>
+                    <a href="{{ url_for('.calculations') }}" class="btn btn-primary">查看记录</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">客户管理</h5>
+                    <p class="card-text">管理客户信息</p>
+                    <a href="{{ url_for('service.customers') }}" class="btn btn-primary">查看客户</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

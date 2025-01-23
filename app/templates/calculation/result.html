@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}计算结果{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-header">计算结果</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">基本信息</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th width="15%">产品</th>
+                                <td>{{ calculation.product.name }}</td>
+                                <th width="15%">订单日期</th>
+                                <td>{{ calculation.order_date.strftime('%Y-%m-%d') if calculation.order_date }}</td>
+                            </tr>
+                            <tr>
+                                <th>尺寸(cm)</th>
+                                <td>{{ calculation.length }} × {{ calculation.width }} × {{ calculation.height }}</td>
+                                <th>尺寸(inch)</th>
+                                <td>{{ calculation.length_inch }} × {{ calculation.width_inch }} × {{ calculation.height_inch }}</td>
+                            </tr>
+                            <tr>
+                                <th>实际重量</th>
+                                <td>{{ calculation.weight }}kg / {{ calculation.weight_lb }}lb</td>
+                                <th>体积重量</th>
+                                <td>{{ calculation.volume_weight }}lb</td>
+                            </tr>
+                            <tr>
+                                <th>计费重量</th>
+                                <td>{{ calculation.chargeable_weight }}lb</td>
+                                <th>分区</th>
+                                <td>{{ calculation.zone }}</td>
+                            </tr>
+                            <tr>
+                                <th>起始邮编</th>
+                                <td>{{ calculation.start_postcode }}</td>
+                                <th>收件邮编</th>
+                                <td>{{ calculation.receiver_postcode }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h5 class="card-title mt-4">费用明细</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>项目</th>
+                                    <th>费用明细</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>基础运费</td>
+                                    <td>${{ "%.2f"|format(calculation.baseRate.amount) }}</td>
+                                </tr>
+                                {% if calculation.surchargeDetails.handlingFee.amount > 0 %}
+                                <tr>
+                                    <td>额外处理费</td>
+                                    <td>
+                                        <div>基础费用：${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.details.baseFee) }}</div>
+                                        <div>PSS费用：${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.details.pssFee) }}</div>
+                                        <div class="text-primary">总费用：${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.amount) }}</div>
+                                        <div class="text-muted">原因：{{ calculation.surchargeDetails.handlingFee.details.reason }}</div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.oversizeFeeResidential.amount > 0 %}
+                                <tr>
+                                    <td>超大超尺寸费(住宅)</td>
+                                    <td>
+                                        <div>基础费用：${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.details.baseFee) }}</div>
+                                        <div>PSS费用：${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.details.pssFee) }}</div>
+                                        <div class="text-primary">总费用：${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.amount) }}</div>
+                                        <div class="text-muted">原因：{{ calculation.surchargeDetails.oversizeFeeResidential.details.reason }}</div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.residentialFee.amount > 0 %}
+                                <tr>
+                                    <td>住宅地址附加费</td>
+                                    <td>
+                                        <div>基础费用：${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.details.baseFee) }}</div>
+                                        <div>PSS费用：${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.details.pssFee) }}</div>
+                                        <div class="text-primary">总费用：${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.amount) }}</div>
+                                        <div class="text-muted">原因：{{ calculation.surchargeDetails.residentialFee.details.reason }}</div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                
+                                <tr>
+                                    <td>燃油费</td>
+                                    <td>
+                                        <div>费率：{{ calculation.fuelSurcharge.rate }}</div>
+                                        <div>计算基数：${{ "%.2f"|format(calculation.fuelSurcharge.basis) }}</div>
+                                        <div class="text-primary">总费用：${{ "%.2f"|format(calculation.fuelSurcharge.amount) }}</div>
+                                    </td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td>总费用</td>
+                                    <td><strong>${{ "%.2f"|format(calculation.totalAmount) }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h5 class="card-title mt-4">附加费明细</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>项目</th>
+                                    <th>基础费用</th>
+                                    <th>PSS费用</th>
+                                    <th>总费用</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if calculation.surchargeDetails.handlingFee.amount > 0 %}
+                                <tr>
+                                    <td>{{ calculation.surchargeDetails.handlingFee.details.reason }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.details.baseFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.details.pssFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.handlingFee.amount) }}</td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.oversizeFeeCommercial.amount > 0 %}
+                                <tr>
+                                    <td>{{ calculation.surchargeDetails.oversizeFeeCommercial.details.reason }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeCommercial.details.baseFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeCommercial.details.pssFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeCommercial.amount) }}</td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.oversizeFeeResidential.amount > 0 %}
+                                <tr>
+                                    <td>{{ calculation.surchargeDetails.oversizeFeeResidential.details.reason }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.details.baseFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.details.pssFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.oversizeFeeResidential.amount) }}</td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.residentialFee.amount > 0 %}
+                                <tr>
+                                    <td>{{ calculation.surchargeDetails.residentialFee.details.reason }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.details.baseFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.details.pssFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.residentialFee.amount) }}</td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if calculation.surchargeDetails.remoteFee.amount > 0 %}
+                                <tr>
+                                    <td>{{ calculation.surchargeDetails.remoteFee.details.reason }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.remoteFee.details.baseFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.remoteFee.details.pssFee) }}</td>
+                                    <td>${{ "%.2f"|format(calculation.surchargeDetails.remoteFee.amount) }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="{{ url_for('.calculate') }}" class="btn btn-primary">继续计算</a>
+                        <a href="{{ url_for('.calculations') }}" class="btn btn-secondary">查看记录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,7 @@
+UPDATE products 
+SET surcharges = JSON_SET(
+    surcharges, 
+    '$[3].items[1].description', 
+    '如果产品超过70磅，将由Ground服务为送至住宅地址，而非Home服务'
+) 
+WHERE id = 3502; 

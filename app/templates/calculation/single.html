@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}运费计算{% endblock %}
+
+{% block content %}
+<div id="calculationApp">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calculator me-2"></i>运费计算
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form @submit.prevent="calculate">
+                            <div class="mb-3">
+                                <label for="product" class="form-label">选择产品</label>
+                                <select class="form-select" id="product" v-model="form.product_id" required>
+                                    <option value="">请选择产品</option>
+                                    <option v-for="product in products" :key="product.id" :value="product.id" v-text="product.name">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="weight" class="form-label">重量 (磅)</label>
+                                    <input type="number" class="form-control" id="weight" 
+                                           v-model="form.weight" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="zone" class="form-label">区域</label>
+                                    <select class="form-select" id="zone" v-model="form.zone" required>
+                                        <option value="">请选择区域</option>
+                                        <option v-for="i in 7" :key="i" :value="'zone' + (i + 1)" v-text="`Zone ${i + 1}`">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="length" class="form-label">长度 (英寸)</label>
+                                    <input type="number" class="form-control" id="length" 
+                                           v-model="form.length" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="width" class="form-label">宽度 (英寸)</label>
+                                    <input type="number" class="form-control" id="width" 
+                                           v-model="form.width" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="height" class="form-label">高度 (英寸)</label>
+                                    <input type="number" class="form-control" id="height" 
+                                           v-model="form.height" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isResidential" 
+                                           v-model="form.is_residential">
+                                    <label class="form-check-label" for="isResidential">
+                                        住宅地址
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" :disabled="calculating">
+                                <i class="fas fa-calculator me-2"></i>
+                                <span v-text="calculating ? '计算中...' : '计算运费'"></span>
+                            </button>
+                        </form>
+                        
+                        <div v-if="result" class="mt-4">
+                            <h5 class="border-bottom pb-2">计算结果</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th style="width: 200px;">基础运费</th>
+                                            <td v-text="`$${formatMoney(result.base_fee)}`"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>额外处理费</th>
+                                            <td v-text="`$${formatMoney(result.handling_fee)}`"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>超大超尺寸费</th>
+                                            <td v-text="`$${formatMoney(result.oversize_fee)}`"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>住宅地址附加费</th>
+                                            <td v-text="`$${formatMoney(result.residential_fee)}`"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>偏远地区附加费</th>
+                                            <td v-text="`$${formatMoney(result.remote_area_fee)}`"></td>
+                                        </tr>
+                                        <tr class="table-primary">
+                                            <th>总费用</th>
+                                            <td class="fw-bold" v-text="`$${formatMoney(result.total_fee)}`"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const app = Vue.createApp({
+    data() {
+        return {
+            form: {
+                product_id: '',
+                weight: '',
+                length: '',
+                width: '',
+                height: '',
+                is_residential: false
+            },
+            products: [],
+            calculating: false,
+            result: null
+        }
+    },
+    methods: {
+        async calculate() {
+            try {
+                this.calculating = true;
+                const response = await axios.post('/api/calculator/calculate', {
+                    product_id: this.form.product_id,
+                    weight: parseFloat(this.form.weight),
+                    length: parseFloat(this.form.length),
+                    width: parseFloat(this.form.width),
+                    height: parseFloat(this.form.height),
+                    is_residential: this.form.is_residential
+                });
+                this.result = response.data;
+            } catch (error) {
+                console.error('计算失败:', error);
+                alert('计算失败，请重试');
+            } finally {
+                this.calculating = false;
+            }
+        },
+        formatMoney(value) {
+            return value.toFixed(2);
+        }
+    },
+    async mounted() {
+        try {
+            const response = await axios.get('/api/products');
+            this.products = response.data;
+        } catch (error) {
+            console.error('获取产品列表失败:', error);
+            alert('获取产品列表失败');
+        }
+    }
+}).mount('#calculationApp');
+</script>
+{% endblock %} 

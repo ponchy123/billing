@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "bootstrap/pagination.html" import render_pagination %}
+
+{% block title %}客户管理 - 运费计算系统{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>客户管理</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">客户列表</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>公司</th>
+                                <th>联系人</th>
+                                <th>电话</th>
+                                <th>状态</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.id }}</td>
+                                <td>{{ customer.username }}</td>
+                                <td>{{ customer.email }}</td>
+                                <td>{{ customer.company }}</td>
+                                <td>{{ customer.contact }}</td>
+                                <td>{{ customer.phone }}</td>
+                                <td>
+                                    {% if customer.is_active %}
+                                    <span class="label label-success">启用</span>
+                                    {% else %}
+                                    <span class="label label-default">禁用</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ moment(customer.created_at).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('service.customer_history', customer_id=customer.id) }}" class="btn btn-info btn-xs">
+                                            <span class="glyphicon glyphicon-list"></span> 查看历史
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ render_pagination(pagination) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

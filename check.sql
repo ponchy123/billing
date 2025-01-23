@@ -1,0 +1,1 @@
+SELECT JSON_UNQUOTE(JSON_EXTRACT(surcharges, '$[3].items[1].description')) as description FROM products WHERE id = 3502; 

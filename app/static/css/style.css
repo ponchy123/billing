@@ -1,0 +1,250 @@
+/* 全局样式 */
+html, body {
+    height: 100%;
+}
+
+/* 布局样式 */
+.admin-layout {
+    min-height: 100vh;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    transition: width 0.3s;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar .nav-link {
+    padding: 0.8rem 1rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 主内容区样式 */
+.main-content {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* 导航栏样式 */
+.navbar .btn-link {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.navbar .btn-link:hover {
+    color: #343a40;
+}
+
+/* 卡片样式 */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* 表格样式 */
+.table th {
+    border-top: none;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* 按钮样式 */
+.btn {
+    font-weight: 500;
+}
+
+.btn-link {
+    text-decoration: none;
+}
+
+/* 表单样式 */
+.form-control:focus,
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* 加载动画样式 */
+.loading-spinner {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        z-index: 1030;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* 加载中组件样式 */
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.spinner-content {
+    position: relative;
+    text-align: center;
+    color: #fff;
+}
+
+.spinner-text {
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
+/* 错误处理组件样式 */
+.error-handler {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* 导航栏样式 */
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* 表格样式 */
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+/* 卡片样式 */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮样式 */
+.btn-link {
+    text-decoration: none;
+}
+
+/* 表单样式 */
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        z-index: 1030;
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Toast 样式 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-success {
+    background-color: #4caf50;
+}
+
+.toast-error {
+    background-color: #f44336;
+}
+
+.toast-warning {
+    background-color: #ff9800;
+}
+
+.toast-info {
+    background-color: #2196f3;
+} 

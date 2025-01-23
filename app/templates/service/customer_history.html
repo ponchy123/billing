@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}客户历史记录 - 运费计算系统{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>客户历史记录</h1>
+    <h3>{{ customer.username }} ({{ customer.company }})</h3>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">计算历史</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>产品</th>
+                                <th>起始邮编</th>
+                                <th>目的邮编</th>
+                                <th>重量(磅)</th>
+                                <th>体积(英寸³)</th>
+                                <th>基础费($)</th>
+                                <th>附加费($)</th>
+                                <th>燃油费($)</th>
+                                <th>总费用($)</th>
+                                <th>计算时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td>{{ record.id }}</td>
+                                <td>{{ record.product.name }}</td>
+                                <td>{{ record.origin_postcode }}</td>
+                                <td>{{ record.destination_postcode }}</td>
+                                <td>{{ record.weight }}</td>
+                                <td>{{ record.length * record.width * record.height }}</td>
+                                <td>{{ "%.2f"|format(record.base_fee) }}</td>
+                                <td>{{ "%.2f"|format(record.total_surcharge) }}</td>
+                                <td>{{ "%.2f"|format(record.fuel_fee) }}</td>
+                                <td>{{ "%.2f"|format(record.total_fee) }}</td>
+                                <td>{{ moment(record.created_at).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="{{ url_for('service.customers') }}" class="btn btn-default">
+            <span class="glyphicon glyphicon-arrow-left"></span> 返回客户列表
+        </a>
+    </div>
+</div>
+{% endblock %} 
