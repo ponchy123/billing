@@ -7,6 +7,11 @@ from flask import Flask, request, jsonify, render_template, send_from_directory,
 from flask_cors import CORS
 from config import Config
 from app.extensions import db, login_manager, migrate, init_extensions
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app(config_class=Config):
     """创建Flask应用"""
@@ -23,9 +28,8 @@ def create_app(config_class=Config):
     config_class.init_app(app)
     
     # 初始化扩展
-    init_extensions(app)
-    
-    # 配置CORS
+    db.init_app(app)
+    migrate.init_app(app, db)
     CORS(app, resources={
         r"/*": {
             "origins": "*",

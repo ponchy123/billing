@@ -6,9 +6,7 @@ sleep 5
 
 # 初始化数据库
 echo "Initializing database..."
-flask db init || true
-flask db migrate || true
-flask db upgrade || true
+python migrations/init_db.py
 
 # 启动应用
 echo "Starting application..."
