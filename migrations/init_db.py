@@ -1,8 +1,8 @@
 import os
 import sys
-import time
-import psycopg2
+from sqlalchemy import create_engine, text
 from urllib.parse import urlparse
+import time
 
 def wait_for_db(db_url, max_retries=5):
     """等待数据库准备就绪"""
@@ -19,17 +19,12 @@ def wait_for_db(db_url, max_retries=5):
             print(f"尝试连接数据库... {retry_count + 1}/{max_retries}")
             print(f"连接信息: host={host}, port={port}, dbname={dbname}, user={user}")
             
-            conn = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=password,
-                host=host,
-                port=port
-            )
-            conn.close()
+            engine = create_engine(db_url)
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
             print("数据库连接成功！")
             return True
-        except psycopg2.OperationalError as e:
+        except Exception as e:
             retry_count += 1
             print(f"连接失败: {str(e)}")
             if retry_count < max_retries:
