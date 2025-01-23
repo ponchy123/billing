@@ -10,6 +10,7 @@ from app.extensions import db, login_manager, migrate, init_extensions
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+# 初始化扩展
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -30,14 +31,7 @@ def create_app(config_class=Config):
     # 初始化扩展
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, resources={
-        r"/*": {
-            "origins": "*",
-            "allow_headers": ["Content-Type", "Authorization"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "expose_headers": ["Content-Type"]
-        }
-    })
+    CORS(app)
     
     # 配置日志
     if not app.debug and not app.testing:
