@@ -7,8 +7,9 @@ export PYTHONPATH=/opt/render/project/src
 
 # 安装依赖
 echo "Installing dependencies..."
-pip install --upgrade pip
-pip install psycopg2-binary --no-cache-dir
+python -m pip install --upgrade pip
+pip install wheel setuptools
+pip install psycopg2-binary==2.9.9 --no-cache-dir
 pip install -r requirements.txt
 
 # 初始化数据库
