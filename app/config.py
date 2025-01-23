@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 import urllib.parse
+import re
 
 class Config:
     # 基础配置
@@ -10,18 +11,36 @@ class Config:
     # 数据库配置
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
-        # 处理Render的postgres://格式
-        if database_url.startswith('postgres://'):
-            database_url = database_url.replace('postgres://', 'postgresql://', 1)
-        # 确保URL是正确的格式
         try:
+            # 处理Render的postgres://格式
+            if database_url.startswith('postgres://'):
+                database_url = database_url.replace('postgres://', 'postgresql://', 1)
+            
+            # 检查是否包含未解析的环境变量
+            if '${' in database_url or '}' in database_url:
+                print(f"警告: 数据库URL包含未解析的环境变量: {database_url}")
+                # 使用默认端口5432
+                database_url = re.sub(r'\${POSTGRES_PORT}', '5432', database_url)
+                # 替换其他可能的环境变量
+                database_url = re.sub(r'\${[^}]+}', '', database_url)
+            
+            # 解析和验证URL
             parsed = urllib.parse.urlparse(database_url)
             if parsed.scheme and parsed.netloc:
+                # 验证端口号
+                port = parsed.port
+                if port is None:
+                    # 如果没有指定端口，使用默认端口
+                    netloc = f"{parsed.netloc}:5432"
+                    database_url = database_url.replace(parsed.netloc, netloc)
+                
                 SQLALCHEMY_DATABASE_URI = database_url
+                print(f"成功配置数据库URL: {database_url}")
             else:
+                print(f"无效的数据库URL格式: {database_url}")
                 SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
         except Exception as e:
-            print(f"数据库URL解析错误: {e}")
+            print(f"数据库URL解析错误: {str(e)}")
             SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
     else:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
@@ -66,13 +85,19 @@ class Config:
         app.logger.info("=== 应用配置 ===")
         app.logger.info(f"环境: {'Production' if os.environ.get('FLASK_ENV') == 'production' else 'Development'}")
         app.logger.info(f"调试模式: {'开启' if app.debug else '关闭'}")
+        
         # 打印数据库URL时隐藏敏感信息
         db_url = Config.SQLALCHEMY_DATABASE_URI
         if db_url.startswith('postgresql://'):
-            parsed = urllib.parse.urlparse(db_url)
-            safe_url = f"{parsed.scheme}://{parsed.username}:****@{parsed.hostname}:{parsed.port}/{parsed.path.lstrip('/')}"
-            app.logger.info(f"数据库URL: {safe_url}")
+            try:
+                parsed = urllib.parse.urlparse(db_url)
+                safe_url = f"{parsed.scheme}://{parsed.username}:****@{parsed.hostname}:{parsed.port or 5432}/{parsed.path.lstrip('/')}"
+                app.logger.info(f"数据库URL: {safe_url}")
+            except Exception as e:
+                app.logger.warning(f"无法解析数据库URL进行显示: {str(e)}")
+                app.logger.info("数据库URL: [已隐藏]")
         else:
             app.logger.info(f"数据库URL: {db_url}")
+        
         app.logger.info(f"上传文件夹: {Config.UPLOAD_FOLDER}")
         app.logger.info(f"CORS配置: {Config.CORS_ORIGINS}") 
