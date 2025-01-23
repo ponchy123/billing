@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 # 初始化数据库
 echo "Initializing database..."
-python init.py
+python migrations/init_db.py
 if [ $? -ne 0 ]; then
     echo "Database initialization failed!"
     exit 1
