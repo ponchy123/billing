@@ -27,4 +27,25 @@ class Config:
     # JWT配置
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key'
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30) 
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+
+    @staticmethod
+    def init_app(app):
+        """初始化应用配置"""
+        # 确保上传目录存在
+        if not os.path.exists(Config.UPLOAD_FOLDER):
+            os.makedirs(Config.UPLOAD_FOLDER)
+        
+        # 配置日志
+        import logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s [%(levelname)s] %(message)s',
+            handlers=[logging.StreamHandler()]
+        )
+        
+        # 打印配置信息
+        app.logger.info("=== 应用配置 ===")
+        app.logger.info(f"数据库URL: {Config.SQLALCHEMY_DATABASE_URI}")
+        app.logger.info(f"上传文件夹: {Config.UPLOAD_FOLDER}")
+        app.logger.info(f"CORS配置: {Config.CORS_ORIGINS}") 
